@@ -1,5 +1,6 @@
 import SwiftUI
 import AVFoundation
+import UIKit
 
 struct CameraPreview: View {
     @StateObject private var model: DataModel
@@ -58,7 +59,7 @@ struct CameraPreviewLayer: UIViewRepresentable {
         let previewLayer = AVCaptureVideoPreviewLayer(session: session)
         previewLayer.frame = view.bounds
         previewLayer.videoGravity = .resizeAspectFill
-        previewLayer.connection?.videoOrientation = .portrait
+        previewLayer.connection?.videoRotationAngle = 0
         view.layer.addSublayer(previewLayer)
         
         return view
@@ -75,19 +76,18 @@ struct CameraPreviewLayer: UIViewRepresentable {
         guard let connection = previewLayer.connection else { return }
         
         let orientation = UIDevice.current.orientation
-        guard connection.isVideoOrientationSupported else { return }
         
         switch orientation {
         case .portrait:
-            connection.videoOrientation = .portrait
+            connection.videoRotationAngle = 0
         case .landscapeRight:
-            connection.videoOrientation = .landscapeLeft
+            connection.videoRotationAngle = .pi / 2
         case .landscapeLeft:
-            connection.videoOrientation = .landscapeRight
+            connection.videoRotationAngle = -.pi / 2
         case .portraitUpsideDown:
-            connection.videoOrientation = .portraitUpsideDown
+            connection.videoRotationAngle = .pi
         default:
-            connection.videoOrientation = .portrait
+            connection.videoRotationAngle = 0
         }
     }
 }
