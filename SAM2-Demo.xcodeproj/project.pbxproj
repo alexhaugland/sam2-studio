@@ -8,6 +8,18 @@
 
 /* Begin PBXBuildFile section */
 		EBAB91282C88A05500F57B83 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = EBAB91272C88A05500F57B83 /* ArgumentParser */; };
+		F70A4A352CA20CC3002F435B /* SAM2SmallImageEncoderFLOAT16.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F70A4A1C2CA20CC3002F435B /* SAM2SmallImageEncoderFLOAT16.mlpackage */; };
+		F70A4A362CA20CC3002F435B /* SAM2SmallMaskDecoderFLOAT16.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F70A4A1D2CA20CC3002F435B /* SAM2SmallMaskDecoderFLOAT16.mlpackage */; };
+		F70A4A372CA20CC3002F435B /* SAM2SmallPromptEncoderFLOAT16.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F70A4A1E2CA20CC3002F435B /* SAM2SmallPromptEncoderFLOAT16.mlpackage */; };
+		F70A4A382CA20CC3002F435B /* SAM2TinyImageEncoderFLOAT16.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F70A4A1F2CA20CC3002F435B /* SAM2TinyImageEncoderFLOAT16.mlpackage */; };
+		F70A4A392CA20CC3002F435B /* SAM2TinyMaskDecoderFLOAT16.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F70A4A202CA20CC3002F435B /* SAM2TinyMaskDecoderFLOAT16.mlpackage */; };
+		F70A4A3A2CA20CC3002F435B /* SAM2TinyPromptEncoderFLOAT16.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F70A4A212CA20CC3002F435B /* SAM2TinyPromptEncoderFLOAT16.mlpackage */; };
+		F70A4A412CA20CC3002F435B /* SAM2SmallMaskDecoderFLOAT16.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F70A4A1D2CA20CC3002F435B /* SAM2SmallMaskDecoderFLOAT16.mlpackage */; };
+		F70A4A432CA20CC3002F435B /* SAM2SmallPromptEncoderFLOAT16.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F70A4A1E2CA20CC3002F435B /* SAM2SmallPromptEncoderFLOAT16.mlpackage */; };
+		F70A4A442CA20CC3002F435B /* SAM2SmallImageEncoderFLOAT16.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F70A4A1C2CA20CC3002F435B /* SAM2SmallImageEncoderFLOAT16.mlpackage */; };
+		F70A4A852CA20DE7002F435B /* SAM2TinyImageEncoderFLOAT16.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F70A4A1F2CA20CC3002F435B /* SAM2TinyImageEncoderFLOAT16.mlpackage */; };
+		F70A4A862CA20DE7002F435B /* SAM2TinyMaskDecoderFLOAT16.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F70A4A202CA20CC3002F435B /* SAM2TinyMaskDecoderFLOAT16.mlpackage */; };
+		F70A4A872CA20DE7002F435B /* SAM2TinyPromptEncoderFLOAT16.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = F70A4A212CA20CC3002F435B /* SAM2TinyPromptEncoderFLOAT16.mlpackage */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,18 +57,15 @@
 		F70A49AA2CA1FA41002F435B /* SAM2-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SAM2-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F70A49B92CA1FA43002F435B /* SAM2-iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SAM2-iOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F70A49C32CA1FA43002F435B /* SAM2-iOSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SAM2-iOSUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F70A4A1C2CA20CC3002F435B /* SAM2SmallImageEncoderFLOAT16.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = SAM2SmallImageEncoderFLOAT16.mlpackage; sourceTree = "<group>"; };
+		F70A4A1D2CA20CC3002F435B /* SAM2SmallMaskDecoderFLOAT16.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = SAM2SmallMaskDecoderFLOAT16.mlpackage; sourceTree = "<group>"; };
+		F70A4A1E2CA20CC3002F435B /* SAM2SmallPromptEncoderFLOAT16.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = SAM2SmallPromptEncoderFLOAT16.mlpackage; sourceTree = "<group>"; };
+		F70A4A1F2CA20CC3002F435B /* SAM2TinyImageEncoderFLOAT16.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = SAM2TinyImageEncoderFLOAT16.mlpackage; sourceTree = "<group>"; };
+		F70A4A202CA20CC3002F435B /* SAM2TinyMaskDecoderFLOAT16.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = SAM2TinyMaskDecoderFLOAT16.mlpackage; sourceTree = "<group>"; };
+		F70A4A212CA20CC3002F435B /* SAM2TinyPromptEncoderFLOAT16.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = SAM2TinyPromptEncoderFLOAT16.mlpackage; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		EBAB912A2C88A21E00F57B83 /* Exceptions for "SAM2-Demo" folder in "sam2-cli" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				SAM2SmallImageEncoderFLOAT16.mlpackage,
-				SAM2SmallMaskDecoderFLOAT16.mlpackage,
-				SAM2SmallPromptEncoderFLOAT16.mlpackage,
-			);
-			target = EBAB911E2C889D5200F57B83 /* sam2-cli */;
-		};
 		F70A4A7A2CA20D2C002F435B /* Exceptions for "Common" folder in "sam2-cli" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -87,9 +96,6 @@
 		};
 		F13632112C73AE78009DEF15 /* SAM2-Demo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				EBAB912A2C88A21E00F57B83 /* Exceptions for "SAM2-Demo" folder in "sam2-cli" target */,
-			);
 			path = "SAM2-Demo";
 			sourceTree = "<group>";
 		};
@@ -162,6 +168,7 @@
 		F13632062C73AE77009DEF15 = {
 			isa = PBXGroup;
 			children = (
+				F70A4A842CA20DD5002F435B /* Models */,
 				F70A4A6A2CA20D2C002F435B /* Common */,
 				F13632112C73AE78009DEF15 /* SAM2-Demo */,
 				EBAB91202C889D5200F57B83 /* sam2-cli */,
@@ -182,6 +189,19 @@
 				F70A49C32CA1FA43002F435B /* SAM2-iOSUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		F70A4A842CA20DD5002F435B /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F70A4A1C2CA20CC3002F435B /* SAM2SmallImageEncoderFLOAT16.mlpackage */,
+				F70A4A1D2CA20CC3002F435B /* SAM2SmallMaskDecoderFLOAT16.mlpackage */,
+				F70A4A1E2CA20CC3002F435B /* SAM2SmallPromptEncoderFLOAT16.mlpackage */,
+				F70A4A1F2CA20CC3002F435B /* SAM2TinyImageEncoderFLOAT16.mlpackage */,
+				F70A4A202CA20CC3002F435B /* SAM2TinyMaskDecoderFLOAT16.mlpackage */,
+				F70A4A212CA20CC3002F435B /* SAM2TinyPromptEncoderFLOAT16.mlpackage */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -393,6 +413,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F70A4A412CA20CC3002F435B /* SAM2SmallMaskDecoderFLOAT16.mlpackage in Sources */,
+				F70A4A432CA20CC3002F435B /* SAM2SmallPromptEncoderFLOAT16.mlpackage in Sources */,
+				F70A4A442CA20CC3002F435B /* SAM2SmallImageEncoderFLOAT16.mlpackage in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -400,6 +423,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F70A4A352CA20CC3002F435B /* SAM2SmallImageEncoderFLOAT16.mlpackage in Sources */,
+				F70A4A362CA20CC3002F435B /* SAM2SmallMaskDecoderFLOAT16.mlpackage in Sources */,
+				F70A4A372CA20CC3002F435B /* SAM2SmallPromptEncoderFLOAT16.mlpackage in Sources */,
+				F70A4A382CA20CC3002F435B /* SAM2TinyImageEncoderFLOAT16.mlpackage in Sources */,
+				F70A4A392CA20CC3002F435B /* SAM2TinyMaskDecoderFLOAT16.mlpackage in Sources */,
+				F70A4A3A2CA20CC3002F435B /* SAM2TinyPromptEncoderFLOAT16.mlpackage in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -407,6 +436,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F70A4A852CA20DE7002F435B /* SAM2TinyImageEncoderFLOAT16.mlpackage in Sources */,
+				F70A4A862CA20DE7002F435B /* SAM2TinyMaskDecoderFLOAT16.mlpackage in Sources */,
+				F70A4A872CA20DE7002F435B /* SAM2TinyPromptEncoderFLOAT16.mlpackage in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

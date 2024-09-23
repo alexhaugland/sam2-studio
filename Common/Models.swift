@@ -120,10 +120,10 @@ struct SAMSegmentation: Hashable, Identifiable {
     }
 
     private mutating func updateTintedImage() {
-        let ciColor = CIColor(color: NSColor(tintColor))
+        let ciColor = CIColor(color: UIColor(tintColor))
         let monochromeFilter = CIFilter.colorMonochrome()
         monochromeFilter.inputImage = image
-        monochromeFilter.color = ciColor!
+        monochromeFilter.color = ciColor
         monochromeFilter.intensity = 1.0
         tintedImage = monochromeFilter.outputImage
     }
