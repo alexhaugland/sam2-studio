@@ -179,24 +179,23 @@ class Camera: NSObject, ObservableObject {
             
             // Set the video orientation based on the device orientation
             #if os(iOS)
-            if videoOutputConnection.isVideoOrientationSupported {
-                let deviceOrientation = UIDevice.current.orientation
-                let videoOrientation: AVCaptureVideoOrientation
-                
-                switch deviceOrientation {
-                case .portrait:
-                    videoOrientation = .portrait
-                case .portraitUpsideDown:
-                    videoOrientation = .portraitUpsideDown
-                case .landscapeLeft:
-                    videoOrientation = .landscapeRight
-                case .landscapeRight:
-                    videoOrientation = .landscapeLeft
-                default:
-                    videoOrientation = .portrait
-                }
-                
-                videoOutputConnection.videoOrientation = videoOrientation
+            let deviceOrientation = UIDevice.current.orientation
+            let rotationAngle: CGFloat
+            
+            switch deviceOrientation {
+            case .portrait:
+                rotationAngle = 90
+            case .portraitUpsideDown:
+                rotationAngle = -90 // probably illegal
+            case .landscapeLeft:
+                rotationAngle = 0
+            case .landscapeRight:
+                rotationAngle = 180
+            default:
+                rotationAngle = 90
+            }
+            if videoOutputConnection.isVideoRotationAngleSupported(rotationAngle) {
+                videoOutputConnection.videoRotationAngle = rotationAngle
             }
             #endif
         }
