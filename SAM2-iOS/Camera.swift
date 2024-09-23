@@ -71,6 +71,19 @@ class Camera: NSObject, ObservableObject {
     private func initialize() {
         sessionQueue = DispatchQueue(label: "session queue")
         captureDevice = availableCaptureDevices.first ?? AVCaptureDevice.default(for: .video)
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateForDeviceOrientation),
+            name: UIDevice.orientationDidChangeNotification,
+            object: nil
+        )
+    }
+    
+    @objc private func updateForDeviceOrientation() {
+        DispatchQueue.main.async {
+            self.updateVideoOutputConnection()
+        }
     }
     
     private func configureCaptureSession(completionHandler: (_ success: Bool) -> Void) {
@@ -166,20 +179,24 @@ class Camera: NSObject, ObservableObject {
             
             // Set the video orientation based on the device orientation
             #if os(iOS)
-            if videoOutputConnection.isVideoRotationAngleSupported(0) {
+            if videoOutputConnection.isVideoOrientationSupported {
                 let deviceOrientation = UIDevice.current.orientation
+                let videoOrientation: AVCaptureVideoOrientation
+                
                 switch deviceOrientation {
                 case .portrait:
-                    videoOutputConnection.videoRotationAngle = 0
+                    videoOrientation = .portrait
                 case .portraitUpsideDown:
-                    videoOutputConnection.videoRotationAngle = 180
+                    videoOrientation = .portraitUpsideDown
                 case .landscapeLeft:
-                    videoOutputConnection.videoRotationAngle = 270
+                    videoOrientation = .landscapeRight
                 case .landscapeRight:
-                    videoOutputConnection.videoRotationAngle = 90
+                    videoOrientation = .landscapeLeft
                 default:
-                    videoOutputConnection.videoRotationAngle = 0
+                    videoOrientation = .portrait
                 }
+                
+                videoOutputConnection.videoOrientation = videoOrientation
             }
             #endif
         }
