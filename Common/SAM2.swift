@@ -67,22 +67,21 @@ class SAM2: ObservableObject {
     // Convenience for use in the CLI
     private var modelLoading: AnyCancellable?
     func ensureModelsAreLoaded() async throws -> SAM2 {
-        let _ = try await withCheckedThrowingContinuation { continuation in
-            modelLoading = self.$initialized.sink { newValue in
-                if let initialized = newValue {
-                    if initialized {
-                        continuation.resume(returning: self)
-                    } else {
-                        continuation.resume(throwing: SAM2Error.modelNotLoaded)
-                    }
+        while true {
+            if let initialized = initialized {
+                if initialized {
+                    return self
+                } else {
+                    throw SAM2Error.modelNotLoaded
                 }
             }
+            try await Task.sleep(nanoseconds: 100_000_000)
         }
-        return self
     }
 
     static func load() async throws -> SAM2 {
-        try await SAM2().ensureModelsAreLoaded()
+        let sam2 = SAM2()
+        return try await sam2.ensureModelsAreLoaded()
     }
 
     func getImageEncoding(from pixelBuffer: CVPixelBuffer) async throws {
