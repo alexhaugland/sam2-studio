@@ -13,7 +13,11 @@ class Camera: NSObject, ObservableObject {
     @Published var isRunning = false
     
     private var allCaptureDevices: [AVCaptureDevice] {
-        AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInTrueDepthCamera, .builtInDualCamera, .builtInDualWideCamera, .builtInWideAngleCamera, .builtInDualWideCamera], mediaType: .video, position: .unspecified).devices
+        #if os(iOS)
+        AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInTrueDepthCamera, .builtInDualCamera, .builtInDualWideCamera, .builtInWideAngleCamera], mediaType: .video, position: .unspecified).devices
+        #else
+        AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: .video, position: .unspecified).devices
+        #endif
     }
     
     private var frontCaptureDevices: [AVCaptureDevice] {
@@ -161,21 +165,23 @@ class Camera: NSObject, ObservableObject {
             }
             
             // Set the video orientation based on the device orientation
-            if videoOutputConnection.isVideoOrientationSupported {
+            #if os(iOS)
+            if videoOutputConnection.isVideoRotationAngleSupported(0) {
                 let deviceOrientation = UIDevice.current.orientation
                 switch deviceOrientation {
                 case .portrait:
-                    videoOutputConnection.videoOrientation = .portrait
+                    videoOutputConnection.videoRotationAngle = 0
                 case .portraitUpsideDown:
-                    videoOutputConnection.videoOrientation = .portraitUpsideDown
+                    videoOutputConnection.videoRotationAngle = 180
                 case .landscapeLeft:
-                    videoOutputConnection.videoOrientation = .landscapeRight
+                    videoOutputConnection.videoRotationAngle = 270
                 case .landscapeRight:
-                    videoOutputConnection.videoOrientation = .landscapeLeft
+                    videoOutputConnection.videoRotationAngle = 90
                 default:
-                    videoOutputConnection.videoOrientation = .portrait
+                    videoOutputConnection.videoRotationAngle = 0
                 }
             }
+            #endif
         }
     }
     
