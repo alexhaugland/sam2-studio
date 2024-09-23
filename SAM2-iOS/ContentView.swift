@@ -12,7 +12,7 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            CameraPreview(model: model)
+            CameraPreview(model: model, segmentation: $segmentation, imageSize: $imageSize)
                 .overlay(
                     GeometryReader { geometry in
                         Color.clear.preference(key: SizePreferenceKey.self, value: geometry.size)
@@ -27,14 +27,11 @@ struct ContentView: View {
                 .onTapGesture {
                     performSegmentation()
                 }
-            
-            if model.sam2Model != nil {
-                if let segmentation = segmentation {
-                    SegmentationOverlay(segmentationImage: .constant(segmentation), imageSize: imageSize, shouldAnimate: true)
+                .overlay {
+                    if model.sam2Model == nil {
+                        ProgressView("Initializing SAM2 model...")
+                    }
                 }
-            } else {
-                ProgressView("Initializing SAM2 model...")
-            }
         }
         .onChange(of: selectedPoints) { _ in
             performSegmentation()
