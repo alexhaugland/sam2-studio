@@ -7,6 +7,11 @@
 
 import Foundation
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 enum SAMCategoryType: Int {
     case background = 0
@@ -120,12 +125,16 @@ struct SAMSegmentation: Hashable, Identifiable {
     }
 
     private mutating func updateTintedImage() {
+        #if canImport(UIKit)
         let ciColor = CIColor(color: UIColor(tintColor))
-        let monochromeFilter = CIFilter.colorMonochrome()
-        monochromeFilter.inputImage = image
-        monochromeFilter.color = ciColor
-        monochromeFilter.intensity = 1.0
-        tintedImage = monochromeFilter.outputImage
+        #elseif canImport(AppKit)
+        let ciColor = CIColor(color: NSColor(tintColor))
+        #endif
+        let monochromeFilter = CIFilter(name: "CIColorMonochrome")
+        monochromeFilter?.setValue(image, forKey: kCIInputImageKey)
+        monochromeFilter?.setValue(ciColor, forKey: kCIInputColorKey)
+        monochromeFilter?.setValue(1.0, forKey: kCIInputIntensityKey)
+        tintedImage = monochromeFilter?.outputImage
     }
 
     var cgImage: CGImage {

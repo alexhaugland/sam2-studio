@@ -63,32 +63,6 @@ struct BoundingBoxPath: View {
     }
 }
 
-struct SegmentationOverlay: View {
-    
-    @Binding var segmentationImage: SAMSegmentation
-    let imageSize: CGSize
-    
-    @State var counter: Int = 0
-    var origin: CGPoint = .zero
-    var shouldAnimate: Bool = false
-    
-    var body: some View {
-        let nsImage = NSImage(cgImage: segmentationImage.cgImage, size: imageSize)
-        Image(nsImage: nsImage)
-            .resizable()
-            .scaledToFit()
-            .allowsHitTesting(false)
-            .frame(width: imageSize.width, height: imageSize.height)
-            .opacity(segmentationImage.isHidden ? 0:0.6)
-            .modifier(RippleEffect(at: CGPoint(x: segmentationImage.cgImage.width/2, y: segmentationImage.cgImage.height/2), trigger: counter))
-            .onAppear {
-                if shouldAnimate {
-                    counter += 1
-                }
-            }
-    }
-}
-
 struct ContentView: View {
     
     // ML Models

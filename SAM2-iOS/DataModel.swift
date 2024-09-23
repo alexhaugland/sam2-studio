@@ -8,6 +8,8 @@ final class DataModel: ObservableObject {
     @Published var viewfinderImage: Image?
     @Published var sam2Model: SAM2?
     
+    @Published var lastFrame: CIImage?
+    
     init() {
         Task {
             await withTaskGroup(of: Void.self) { group in
@@ -20,10 +22,11 @@ final class DataModel: ObservableObject {
     @MainActor
     func handleCameraPreviews() async {
         let imageStream = camera.previewStream
-            .map { $0.image }
+            .map { $0 }
         
         for await image in imageStream {
-            viewfinderImage = image
+            viewfinderImage = image.image
+            lastFrame = image
         }
     }
     
