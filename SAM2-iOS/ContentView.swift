@@ -55,7 +55,7 @@ struct ContentView: View {
     private func performSegmentation() {
         Task {
             do {
-                guard let buffer = model.lastFrame?.pixelBuffer else { return }
+                guard let buffer = model.lastFrame?.pixelBuffer(width: 1024, height: 1024) else { return }
                 try await model.sam2Model?.getImageEncoding(from: buffer)
                 try await model.sam2Model?.getPromptEncoding(from: selectedPoints, with: imageSize)
                 
