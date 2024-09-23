@@ -51,18 +51,31 @@
 		EBAB912A2C88A21E00F57B83 /* Exceptions for "SAM2-Demo" folder in "sam2-cli" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				"Common/CGImage+Extension.swift",
-				"Common/CGImage+RawBytes.swift",
-				Common/CoreImageExtensions.swift,
-				Common/DirectoryDocument.swift,
-				"Common/MLMultiArray+Image.swift",
-				Common/Models.swift,
-				Common/SAM2.swift,
 				SAM2SmallImageEncoderFLOAT16.mlpackage,
 				SAM2SmallMaskDecoderFLOAT16.mlpackage,
 				SAM2SmallPromptEncoderFLOAT16.mlpackage,
 			);
 			target = EBAB911E2C889D5200F57B83 /* sam2-cli */;
+		};
+		F70A4A7A2CA20D2C002F435B /* Exceptions for "Common" folder in "sam2-cli" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"CGImage+Extension.swift",
+				"CGImage+RawBytes.swift",
+				CoreImageExtensions.swift,
+				DirectoryDocument.swift,
+				"MLMultiArray+Image.swift",
+				Models.swift,
+				SAM2.swift,
+			);
+			target = EBAB911E2C889D5200F57B83 /* sam2-cli */;
+		};
+		F70A4A832CA20D43002F435B /* Exceptions for "Common" folder in "SAM2-iOS" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"NSImage+Extension.swift",
+			);
+			target = F70A49A92CA1FA41002F435B /* SAM2-iOS */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -93,6 +106,15 @@
 		F70A49C62CA1FA43002F435B /* SAM2-iOSUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "SAM2-iOSUITests";
+			sourceTree = "<group>";
+		};
+		F70A4A6A2CA20D2C002F435B /* Common */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F70A4A7A2CA20D2C002F435B /* Exceptions for "Common" folder in "sam2-cli" target */,
+				F70A4A832CA20D43002F435B /* Exceptions for "Common" folder in "SAM2-iOS" target */,
+			);
+			path = Common;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -140,6 +162,7 @@
 		F13632062C73AE77009DEF15 = {
 			isa = PBXGroup;
 			children = (
+				F70A4A6A2CA20D2C002F435B /* Common */,
 				F13632112C73AE78009DEF15 /* SAM2-Demo */,
 				EBAB91202C889D5200F57B83 /* sam2-cli */,
 				F70A49AB2CA1FA41002F435B /* SAM2-iOS */,
@@ -201,6 +224,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				F13632112C73AE78009DEF15 /* SAM2-Demo */,
+				F70A4A6A2CA20D2C002F435B /* Common */,
 			);
 			name = "SAM2-Demo";
 			packageProductDependencies = (
@@ -223,6 +247,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				F70A49AB2CA1FA41002F435B /* SAM2-iOS */,
+				F70A4A6A2CA20D2C002F435B /* Common */,
 			);
 			name = "SAM2-iOS";
 			packageProductDependencies = (
