@@ -3,13 +3,9 @@ import AVFoundation
 import UIKit
 
 struct CameraPreview: View {
-    @StateObject private var model: DataModel
+    @ObservedObject var model: DataModel
     @State private var orientation = UIDeviceOrientation.portrait
     
-    init() {
-        _model = StateObject(wrappedValue: DataModel())
-    }
-
     var body: some View {
         GeometryReader { geometry in
             ZStack {

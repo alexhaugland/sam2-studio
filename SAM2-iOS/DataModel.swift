@@ -6,10 +6,12 @@ final class DataModel: ObservableObject {
     let camera = Camera()
     
     @Published var viewfinderImage: Image?
+    @Published var sam2Model: SAM2?
     
     init() {
         Task {
             await handleCameraPreviews()
+            await initializeSAM2Model()
         }
     }
     
@@ -17,9 +19,19 @@ final class DataModel: ObservableObject {
     func handleCameraPreviews() async {
         let imageStream = camera.previewStream
             .map { $0.image }
-
+        
         for await image in imageStream {
             viewfinderImage = image
+        }
+    }
+    
+    @MainActor
+    private func initializeSAM2Model() async {
+        do {
+            sam2Model = try await SAM2.load()
+            logger.info("SAM2 model initialized successfully")
+        } catch {
+            logger.error("Failed to initialize SAM2 model: \(error.localizedDescription)")
         }
     }
 }
