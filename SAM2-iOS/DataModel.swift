@@ -10,8 +10,10 @@ final class DataModel: ObservableObject {
     
     init() {
         Task {
-            await handleCameraPreviews()
-            await initializeSAM2Model()
+            await withTaskGroup(of: Void.self) { group in
+                group.addTask { await self.initializeSAM2Model() }
+                group.addTask { await self.handleCameraPreviews() }
+            }
         }
     }
     
