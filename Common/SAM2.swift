@@ -15,8 +15,8 @@ import UniformTypeIdentifiers
 @MainActor
 class SAM2: ObservableObject {
     
-    @Published var imageEncodings: SAM2TinyImageEncoderFLOAT16Output?
-    @Published var promptEncodings: SAM2TinyPromptEncoderFLOAT16Output?
+    @Published private(set) var imageEncodings: SAM2TinyImageEncoderFLOAT16Output?
+    @Published private(set) var promptEncodings: SAM2TinyPromptEncoderFLOAT16Output?
 
     @Published private(set) var initializationTime: TimeInterval?
     @Published private(set) var initialized: Bool?
@@ -50,17 +50,20 @@ class SAM2: ObservableObject {
             }.value
             
             let endTime = CFAbsoluteTimeGetCurrent()
-            self.initializationTime = endTime - startTime
-            self.initialized = true
-
-            self.imageEncoderModel = imageEncoder
-            self.promptEncoderModel = promptEncoder
-            self.maskDecoderModel = maskDecoder
-            print("Initialized models in \(String(format: "%.4f", self.initializationTime!)) seconds")
+            await MainActor.run {
+                self.initializationTime = endTime - startTime
+                self.initialized = true
+                self.imageEncoderModel = imageEncoder
+                self.promptEncoderModel = promptEncoder
+                self.maskDecoderModel = maskDecoder
+            }
+            print("Initialized models in \(String(format: "%.4f", endTime - startTime)) seconds")
         } catch {
             print("Failed to initialize models: \(error)")
-            self.initializationTime = nil
-            self.initialized = false
+            await MainActor.run {
+                self.initializationTime = nil
+                self.initialized = false
+            }
         }
     }
 
@@ -89,8 +92,13 @@ class SAM2: ObservableObject {
             throw SAM2Error.modelNotLoaded
         }
         
-        let encoding = try model.prediction(image: pixelBuffer)
-        self.imageEncodings = encoding
+        let encoding = try await Task.detached(priority: .userInitiated) {
+            try model.prediction(image: pixelBuffer)
+        }.value
+        
+        await MainActor.run {
+            self.imageEncodings = encoding
+        }
     }
 
     func getImageEncoding(from url: URL) async throws {
@@ -99,8 +107,13 @@ class SAM2: ObservableObject {
         }
 
         let inputs = try SAM2TinyImageEncoderFLOAT16Input(imageAt: url)
-        let encoding = try await model.prediction(input: inputs)
-        self.imageEncodings = encoding
+        let encoding = try await Task.detached(priority: .userInitiated) {
+            try model.prediction(input: inputs)
+        }.value
+        
+        await MainActor.run {
+            self.imageEncodings = encoding
+        }
     }
 
     func getPromptEncoding(from allPoints: [SAMPoint], with size: CGSize) async throws {
@@ -110,18 +123,26 @@ class SAM2: ObservableObject {
         
         let transformedCoords = try transformCoords(allPoints.map { $0.coordinates }, normalize: false, origHW: size)
 
-        // Create MLFeatureProvider with the required input format
-        let pointsMultiArray = try MLMultiArray(shape: [1, NSNumber(value: allPoints.count), 2], dataType: .float32)
-        let labelsMultiArray = try MLMultiArray(shape: [1, NSNumber(value: allPoints.count)], dataType: .int32)
+        let (pointsMultiArray, labelsMultiArray) = try await Task.detached(priority: .userInitiated) {
+            let pointsMultiArray = try MLMultiArray(shape: [1, NSNumber(value: allPoints.count), 2], dataType: .float32)
+            let labelsMultiArray = try MLMultiArray(shape: [1, NSNumber(value: allPoints.count)], dataType: .int32)
+            
+            for (index, point) in transformedCoords.enumerated() {
+                pointsMultiArray[[0, index, 0] as [NSNumber]] = NSNumber(value: Float(point.x))
+                pointsMultiArray[[0, index, 1] as [NSNumber]] = NSNumber(value: Float(point.y))
+                labelsMultiArray[[0, index] as [NSNumber]] = NSNumber(value: allPoints[index].category.type.rawValue)
+            }
+            
+            return (pointsMultiArray, labelsMultiArray)
+        }.value
         
-        for (index, point) in transformedCoords.enumerated() {
-            pointsMultiArray[[0, index, 0] as [NSNumber]] = NSNumber(value: Float(point.x))
-            pointsMultiArray[[0, index, 1] as [NSNumber]] = NSNumber(value: Float(point.y))
-            labelsMultiArray[[0, index] as [NSNumber]] = NSNumber(value: allPoints[index].category.type.rawValue)
+        let encoding = try await Task.detached(priority: .userInitiated) {
+            try model.prediction(points: pointsMultiArray, labels: labelsMultiArray)
+        }.value
+        
+        await MainActor.run {
+            self.promptEncodings = encoding
         }
-        
-        let encoding = try model.prediction(points: pointsMultiArray, labels: labelsMultiArray)
-        self.promptEncodings = encoding
     }
 
     func bestMask(for output: SAM2TinyMaskDecoderFLOAT16Output) -> MLMultiArray {
@@ -149,37 +170,42 @@ class SAM2: ObservableObject {
     }
 
     func getMask(for original_size: CGSize) async throws -> CIImage? {
-        guard let model = maskDecoderModel else {
+        guard let model = maskDecoderModel,
+              let image_embedding = self.imageEncodings?.image_embedding,
+              let feats0 = self.imageEncodings?.feats_s0,
+              let feats1 = self.imageEncodings?.feats_s1,
+              let sparse_embedding = self.promptEncodings?.sparse_embeddings,
+              let dense_embedding = self.promptEncodings?.dense_embeddings else {
             throw SAM2Error.modelNotLoaded
         }
-        
-        if let image_embedding = self.imageEncodings?.image_embedding,
-           let feats0 = self.imageEncodings?.feats_s0,
-           let feats1 = self.imageEncodings?.feats_s1,
-           let sparse_embedding = self.promptEncodings?.sparse_embeddings,
-           let dense_embedding = self.promptEncodings?.dense_embeddings {
-            let output = try model.prediction(image_embedding: image_embedding, sparse_embedding: sparse_embedding, dense_embedding: dense_embedding, feats_s0: feats0, feats_s1: feats1)
 
-            // Extract best mask and ignore the others
-            let lowFeatureMask = bestMask(for: output)
+        let output = try await Task.detached(priority: .userInitiated) {
+            try model.prediction(image_embedding: image_embedding,
+                                 sparse_embedding: sparse_embedding,
+                                 dense_embedding: dense_embedding,
+                                 feats_s0: feats0,
+                                 feats_s1: feats1)
+        }.value
 
-            // TODO: optimization
-            // Preserve range for upsampling
-            var minValue: Double = 9999
-            var maxValue: Double = -9999
-            for i in 0..<lowFeatureMask.count {
-                let v = lowFeatureMask[i].doubleValue
-                if v > maxValue { maxValue = v }
-                if v < minValue { minValue = v }
-            }
-            let threshold = -minValue / (maxValue - minValue)
+        // Extract best mask and ignore the others
+        let lowFeatureMask = bestMask(for: output)
 
-            // Resize first, then threshold
-            if let maskcgImage = lowFeatureMask.cgImage(min: minValue, max: maxValue) {
-                let ciImage = CIImage(cgImage: maskcgImage, options: [.colorSpace: NSNull()])
-                let resizedImage = try resizeImage(ciImage, to: original_size, applyingThreshold: Float(threshold))
-                return resizedImage?.maskedToAlpha()?.samTinted()
-            }
+        // TODO: optimization
+        // Preserve range for upsampling
+        var minValue: Double = 9999
+        var maxValue: Double = -9999
+        for i in 0..<lowFeatureMask.count {
+            let v = lowFeatureMask[i].doubleValue
+            if v > maxValue { maxValue = v }
+            if v < minValue { minValue = v }
+        }
+        let threshold = -minValue / (maxValue - minValue)
+
+        // Resize first, then threshold
+        if let maskcgImage = lowFeatureMask.cgImage(min: minValue, max: maxValue) {
+            let ciImage = CIImage(cgImage: maskcgImage, options: [.colorSpace: NSNull()])
+            let resizedImage = try resizeImage(ciImage, to: original_size, applyingThreshold: Float(threshold))
+            return resizedImage?.maskedToAlpha()?.samTinted()
         }
         return nil
     }

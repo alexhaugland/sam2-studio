@@ -2,16 +2,14 @@ import AVFoundation
 import SwiftUI
 import os.log
 import Combine
+import Dispatch
 
 actor SAMActor {
     var lastFrame: CIImage?
     var sam2Model: SAM2?
     
-    nonisolated let camera = Camera()
-    
     func initialize() async throws {
         sam2Model = try await SAM2.load()
-        await camera.start()
         logger.info("SAM2 initialized successfully")
     }
     
@@ -19,15 +17,16 @@ actor SAMActor {
         lastFrame = image
     }
     
-    func performSegmentation(selectedPoints: [SAMPoint], imageSize: CGSize) async throws -> SAMSegmentation? {
-        guard let buffer = lastFrame?.pixelBuffer(width: 1024, height: 1024) else {
+    nonisolated func performSegmentation(selectedPoints: [SAMPoint], imageSize: CGSize) async throws -> SAMSegmentation? {
+        guard let buffer = await lastFrame?.pixelBuffer(width: 1024, height: 1024) else {
             return nil
         }
+        guard let model = await sam2Model else { return nil }
         
-        try await sam2Model?.getImageEncoding(from: buffer)
-        try await sam2Model?.getPromptEncoding(from: selectedPoints, with: imageSize)
+        try await model.getImageEncoding(from: buffer)
+        try await model.getPromptEncoding(from: selectedPoints, with: imageSize)
         
-        if let mask = try await sam2Model?.getMask(for: imageSize) {
+        if let mask = try await model.getMask(for: imageSize) {
             return SAMSegmentation(image: mask, title: "Camera Segmentation")
         }
         
@@ -38,6 +37,7 @@ actor SAMActor {
 @MainActor
 final class DataModel: ObservableObject {
     private let samActor = SAMActor()
+    private let camera = Camera()
     
     @Published var samReady: Bool = false
     @Published var viewfinderImage: Image?
@@ -53,6 +53,7 @@ final class DataModel: ObservableObject {
     private func initialize() async {
         do {
             try await samActor.initialize()
+            await camera.start()
             samReady = true
         } catch {
             logger.error("Failed to initialize SAM2: \(error.localizedDescription)")
@@ -62,7 +63,7 @@ final class DataModel: ObservableObject {
     }
     
     private func handleCameraPreviews() async {
-        let imageStream = samActor.camera.previewStream.map { $0 }
+        let imageStream = camera.previewStream.map { $0 }
         
         for await image in imageStream {
             viewfinderImage = image.image
@@ -77,12 +78,12 @@ final class DataModel: ObservableObject {
         Task {
             do {
                 if let result = try await samActor.performSegmentation(selectedPoints: selectedPoints, imageSize: imageSize) {
-                    segmentation = result
+                    self.segmentation = result
                 }
             } catch {
                 print("Error performing segmentation: \(error)")
             }
-            isPerformingSegmentation = false
+            self.isPerformingSegmentation = false
         }
     }
 }
