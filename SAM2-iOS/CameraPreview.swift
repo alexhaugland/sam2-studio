@@ -22,10 +22,5 @@ struct CameraPreview: View {
                 }
             }
         }
-        .onAppear {
-            Task {
-                await model.camera.start()
-            }
-        }
     }
 }

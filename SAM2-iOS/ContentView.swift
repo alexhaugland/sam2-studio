@@ -27,7 +27,7 @@ struct ContentView: View {
                     model.performSegmentation(selectedPoints: selectedPoints, imageSize: imageSize)
                 }
                 .overlay {
-                    if model.sam2Model == nil {
+                    if !model.samReady {
                         ProgressView("Initializing SAM2 model...")
                     } else if model.isPerformingSegmentation {
                         ProgressView("Performing segmentation...")
@@ -36,7 +36,7 @@ struct ContentView: View {
             SelectedPointsOverlay(points: selectedPoints, imageSize: imageSize)
         }
         .onChange(of: selectedPoints) { _ in
-            // model.performSegmentation(selectedPoints: selectedPoints, imageSize: imageSize)
+            model.performSegmentation(selectedPoints: selectedPoints, imageSize: imageSize)
         }
     }
     
