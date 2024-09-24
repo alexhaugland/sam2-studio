@@ -8,6 +8,7 @@ struct ContentView: View {
     
     @State private var selectedPoints: [SAMPoint] = []
     @State private var imageSize: CGSize = .zero
+    @State private var timer: Timer?
     
     var body: some View {
         ZStack {
@@ -23,21 +24,32 @@ struct ContentView: View {
                         addCenterPoints(size: size)
                     }
                 }
-                .onTapGesture {
-                    model.performSegmentation(selectedPoints: selectedPoints, imageSize: imageSize)
-                }
                 .overlay {
                     if !model.samReady {
                         ProgressView("Initializing SAM2 model...")
-                    } else if model.isPerformingSegmentation {
-                        ProgressView("Performing segmentation...")
                     }
                 }
             SelectedPointsOverlay(points: selectedPoints, imageSize: imageSize)
         }
-        .onChange(of: selectedPoints) { _ in
-            model.performSegmentation(selectedPoints: selectedPoints, imageSize: imageSize)
+        .onAppear {
+            startSegmentationTimer()
         }
+        .onDisappear {
+            stopSegmentationTimer()
+        }
+    }
+    
+    private func startSegmentationTimer() {
+        timer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { _ in
+            Task { @MainActor in
+                await model.performSegmentation(selectedPoints: selectedPoints, imageSize: imageSize)
+            }
+        }
+    }
+    
+    private func stopSegmentationTimer() {
+        timer?.invalidate()
+        timer = nil
     }
     
     private func addCenterPoints(size: CGSize) {
