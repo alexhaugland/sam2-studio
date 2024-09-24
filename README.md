@@ -1,4 +1,4 @@
-# SAM2 Studio
+# SAM2 Studio (realtime iOS fork)
 
 This is a Swift demo app for SAM 2 Core ML models.
 
