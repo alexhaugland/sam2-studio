@@ -7,12 +7,11 @@ struct ContentView: View {
     @StateObject private var model = DataModel()
     
     @State private var selectedPoints: [SAMPoint] = []
-    @State private var segmentation: SAMSegmentation?
     @State private var imageSize: CGSize = .zero
     
     var body: some View {
         ZStack {
-            CameraPreview(model: model, segmentation: $segmentation, imageSize: $imageSize)
+            CameraPreview(model: model, segmentation: $model.segmentation, imageSize: $imageSize)
                 .overlay(
                     GeometryReader { geometry in
                         Color.clear.preference(key: SizePreferenceKey.self, value: geometry.size)
@@ -25,17 +24,19 @@ struct ContentView: View {
                     }
                 }
                 .onTapGesture {
-                    performSegmentation()
+                    model.performSegmentation(selectedPoints: selectedPoints, imageSize: imageSize)
                 }
                 .overlay {
                     if model.sam2Model == nil {
                         ProgressView("Initializing SAM2 model...")
+                    } else if model.isPerformingSegmentation {
+                        ProgressView("Performing segmentation...")
                     }
                 }
             SelectedPointsOverlay(points: selectedPoints, imageSize: imageSize)
         }
         .onChange(of: selectedPoints) { _ in
-            performSegmentation()
+            // model.performSegmentation(selectedPoints: selectedPoints, imageSize: imageSize)
         }
     }
     
@@ -50,24 +51,6 @@ struct ContentView: View {
             SAMPoint(coordinates: CGPoint(x: (centerX - offset) / size.width, y: (centerY + offset) / size.height), category: .foreground),
             SAMPoint(coordinates: CGPoint(x: (centerX + offset) / size.width, y: (centerY + offset) / size.height), category: .foreground)
         ]
-    }
-    
-    private func performSegmentation() {
-        Task {
-            do {
-                guard let buffer = model.lastFrame?.pixelBuffer(width: 1024, height: 1024) else { return }
-                try await model.sam2Model?.getImageEncoding(from: buffer)
-                try await model.sam2Model?.getPromptEncoding(from: selectedPoints, with: imageSize)
-                
-                if let mask = try await model.sam2Model?.getMask(for: imageSize) {
-                    DispatchQueue.main.async {
-                        self.segmentation = SAMSegmentation(image: mask, title: "Camera Segmentation")
-                    }
-                }
-            } catch {
-                print("Error performing segmentation: \(error)")
-            }
-        }
     }
 }
 

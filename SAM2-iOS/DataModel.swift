@@ -1,6 +1,7 @@
 import AVFoundation
 import SwiftUI
 import os.log
+import Combine
 
 final class DataModel: ObservableObject {
     let camera = Camera()
@@ -9,6 +10,11 @@ final class DataModel: ObservableObject {
     @Published var sam2Model: SAM2?
     
     @Published var lastFrame: CIImage?
+    
+    @Published var segmentation: SAMSegmentation?
+    @Published var isPerformingSegmentation = false
+    
+    private var cancellables = Set<AnyCancellable>()
     
     init() {
         Task {
@@ -37,6 +43,41 @@ final class DataModel: ObservableObject {
             logger.info("SAM2 model initialized successfully")
         } catch {
             logger.error("Failed to initialize SAM2 model: \(error.localizedDescription)")
+        }
+    }
+    
+    func donePerformingSegmentation() async {
+        await MainActor.run {
+            self.isPerformingSegmentation = false
+        }
+    }
+    
+    func performSegmentation(selectedPoints: [SAMPoint], imageSize: CGSize) {
+        guard !isPerformingSegmentation else { return }
+        isPerformingSegmentation = true
+        
+        Task.detached(priority: .userInitiated) {
+            do {
+                guard let buffer = self.lastFrame?.pixelBuffer(width: 1024, height: 1024) else {
+                    await self.donePerformingSegmentation()
+                    return
+                }
+                
+                try await self.sam2Model?.getImageEncoding(from: buffer)
+                try await self.sam2Model?.getPromptEncoding(from: selectedPoints, with: imageSize)
+                
+                if let mask = try await self.sam2Model?.getMask(for: imageSize) {
+                    await MainActor.run {
+                        self.segmentation = SAMSegmentation(image: mask, title: "Camera Segmentation")
+                        self.isPerformingSegmentation = false
+                    }
+                } else {
+                    await self.donePerformingSegmentation()
+                }
+            } catch {
+                print("Error performing segmentation: \(error)")
+                await self.donePerformingSegmentation()
+            }
         }
     }
 }
